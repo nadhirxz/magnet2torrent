@@ -6,5 +6,9 @@
 	"preferGlobal": true,
 	"bin": "./index.js",
 	"author": "Nadhir",
-	"license": "MIT"
+	"license": "MIT",
+	"dependencies": {
+		"commander": "^8.3.0",
+		"pkginfo": "^0.4.1"
+	}
 }
