@@ -1,0 +1,10 @@
+{
+	"name": "magnet2torrent",
+	"version": "1.0.0",
+	"description": "Convert magnet to torrent",
+	"main": "index.js",
+	"preferGlobal": true,
+	"bin": "./index.js",
+	"author": "Nadhir",
+	"license": "MIT"
+}
