@@ -1,5 +1,5 @@
 const { program } = require('commander');
-const getTorrent = require('./utils/torrent');
+const { getTorrent } = require('./utils/torrent');
 require('pkginfo')(module);
 
 program

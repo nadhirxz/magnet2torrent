@@ -2,7 +2,10 @@ const PeerDiscovery = require('torrent-discovery');
 const { randomBytes } = require('crypto');
 const { getMetadata } = require('./metadata');
 
-function torrentDiscovery(torrent) {
+let connecting = true;
+let gotNoPeers = true;
+
+function torrentDiscovery(torrent, connectingSpinner, metadataSpinner) {
 	const infoHash = torrent.infoHash;
 	const peerId = randomBytes(20);
 
@@ -17,6 +20,12 @@ function torrentDiscovery(torrent) {
 		});
 
 		discovery.on('peer', addr => {
+			connecting && connectingSpinner.succeed();
+			gotNoPeers && metadataSpinner.start();
+
+			connecting = false;
+			gotNoPeers = false;
+
 			const [address, port] = addr.split(':');
 			getMetadata(port, address, infoHash, peerId.toString('hex'), metadata => {
 				discovery.destroy();
