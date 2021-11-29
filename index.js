@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { program } = require('commander');
 const { getTorrent } = require('./utils/torrent');
 require('pkginfo')(module);
