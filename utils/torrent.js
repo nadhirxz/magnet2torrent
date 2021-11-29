@@ -38,7 +38,7 @@ function getTorrent(magnet, output) {
 			process.exit(0);
 		});
 	} catch (error) {
-		spinner.stop();
+		connectingSpinner.stop();
 		console.log(chalk.red.bold(`error: ${error.message.toLowerCase()}`));
 	}
 }
