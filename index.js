@@ -5,7 +5,7 @@ require('pkginfo')(module);
 program
 	.version(module.exports.version)
 	.description(module.exports.description)
-	.argument('<magnet>', 'magnet uri')
+	.argument('<magnet>', 'full magnet uri or info hash only')
 	.option('-o, --output <filename>', 'torrent file output')
 	.action(magnet => getTorrent(magnet, program.opts().output))
 	.parse();
