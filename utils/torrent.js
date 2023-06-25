@@ -21,25 +21,26 @@ const metadataSpinner = ora({
 	color: 'yellow',
 });
 
-function getTorrent(magnet, output) {
+async function getTorrent(magnet, output) {
 	try {
 		magnet = parseTorrent(magnet);
 		connectingSpinner.start();
 
-		torrentDiscovery(magnet, connectingSpinner, metadataSpinner).then(metadata => {
-			metadata = parseTorrent(metadata);
-			output = output || metadata.name || magnet.infoHash.toUpperCase();
-			const file = parseTorrent.toTorrentFile({ ...parseTorrent(metadata), announce: magnet.announce || [] });
-			const filename = (/[.]/.exec(output) ? /[^.]+$/.exec(output)[0] : undefined) == 'torrent' ? output : output + '.torrent';
-			writeFileSync(filename, file);
+		const metadata = await torrentDiscovery(magnet, connectingSpinner, metadataSpinner);
 
-			metadataSpinner.succeed();
-			console.log(chalk.green(`torrent saved as ${chalk.bold(filename)}`));
-			process.exit(0);
-		});
+		metadata = parseTorrent(metadata);
+		output = output || metadata.name || magnet.infoHash.toUpperCase();
+		const file = parseTorrent.toTorrentFile({ ...parseTorrent(metadata), announce: magnet.announce || [] });
+		const filename = (/[.]/.exec(output) ? /[^.]+$/.exec(output)[0] : undefined) == 'torrent' ? output : output + '.torrent';
+		writeFileSync(filename, file);
+
+		metadataSpinner.succeed();
+		console.log(chalk.green(`torrent saved as ${chalk.bold(filename)}`));
 	} catch (error) {
 		connectingSpinner.stop();
 		console.log(chalk.red.bold(`error: ${error.message.toLowerCase()}`));
+	} finally {
+		process.exit(0);
 	}
 }
 
