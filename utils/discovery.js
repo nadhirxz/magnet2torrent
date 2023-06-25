@@ -32,6 +32,10 @@ function torrentDiscovery(torrent, connectingSpinner, metadataSpinner) {
 				resolve(metadata);
 			});
 		});
+
+		discovery.on('error', err => {
+			reject(err ?? 'could not connect to any peers');
+		});
 	});
 }
 
