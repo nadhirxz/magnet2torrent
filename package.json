@@ -11,7 +11,11 @@
 		"package-mac": "npm run package -- -t node14-macos-x64",
 		"package-win": "npm run package -- -t node14-win-x64"
 	},
-	"author": "Nadhir",
+	"author": "Nadhir Ferdji",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nadhirxz/magnet2torrent.git"
+	},
 	"license": "MIT",
 	"dependencies": {
 		"bittorrent-protocol": "^3.4.3",
