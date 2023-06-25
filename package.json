@@ -18,13 +18,13 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"bittorrent-protocol": "^3.4.3",
+		"bittorrent-protocol": "^3.5.4",
 		"chalk": "^4.1.2",
-		"commander": "^8.3.0",
+		"commander": "^11.0.0",
 		"ora": "^5.4.1",
-		"parse-torrent": "^9.1.4",
+		"parse-torrent": "^9.1.5",
 		"pkginfo": "^0.4.1",
-		"torrent-discovery": "^9.4.7",
+		"torrent-discovery": "^9.4.15",
 		"ut_metadata": "^3.5.2"
 	}
 }
