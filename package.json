@@ -7,9 +7,9 @@
 	"bin": "./index.js",
 	"scripts": {
 		"package": "npx pkg package.json --out-path dist",
-		"package-linux": "npm run package -- -t node14-linux-x64",
-		"package-mac": "npm run package -- -t node14-macos-x64",
-		"package-win": "npm run package -- -t node14-win-x64"
+		"package-linux": "npm run package -- -t node18-linux-x64",
+		"package-mac": "npm run package -- -t node18-macos-x64",
+		"package-win": "npm run package -- -t node18-win-x64"
 	},
 	"author": "Nadhir Ferdji",
 	"repository": {
