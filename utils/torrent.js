@@ -38,7 +38,8 @@ async function getTorrent(magnet, output) {
 		console.log(chalk.green(`torrent saved as ${chalk.bold(filename)}`));
 	} catch (error) {
 		connectingSpinner.stop();
-		console.log(chalk.red.bold(`error: ${error.message.toLowerCase()}`));
+		metadataSpinner.stop();
+		console.log(chalk.red(`error: ${error?.message?.toLowerCase() ?? error}`));
 	} finally {
 		process.exit(0);
 	}
