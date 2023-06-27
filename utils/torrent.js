@@ -26,9 +26,9 @@ async function getTorrent(magnet, output) {
 		magnet = parseTorrent(magnet);
 		connectingSpinner.start();
 
-		const metadata = await torrentDiscovery(magnet, connectingSpinner, metadataSpinner);
+		const torrent = await torrentDiscovery(magnet, connectingSpinner, metadataSpinner);
 
-		metadata = parseTorrent(metadata);
+		metadata = parseTorrent(torrent);
 		output = output || metadata.name || magnet.infoHash.toUpperCase();
 		const file = parseTorrent.toTorrentFile({ ...parseTorrent(metadata), announce: magnet.announce || [] });
 		const filename = (/[.]/.exec(output) ? /[^.]+$/.exec(output)[0] : undefined) == 'torrent' ? output : output + '.torrent';
