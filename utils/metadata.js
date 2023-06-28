@@ -5,7 +5,6 @@ const ut_metadata = require('ut_metadata');
 function getMetadata(port, address, infoHash, peerId, callback) {
 	const socket = new net.Socket();
 
-	socket.setTimeout(30000);
 	socket.connect(port, address, () => {
 		const wire = new Protocol();
 

@@ -26,20 +26,10 @@ function torrentDiscovery(torrent, connectingSpinner, metadataSpinner, timeout =
 				metadataSpinner.start();
 			}
 
-			getMetadata(
-				port,
-				address,
-				torrent.infoHash,
-				randomBytes(20).toString('hex'),
-				metadata => {
-					dht.destroy();
-					resolve(metadata);
-				},
-				error => {
-					dht.destroy();
-					reject(error);
-				}
-			);
+			getMetadata(port, address, torrent.infoHash, randomBytes(20).toString('hex'), metadata => {
+				dht.destroy();
+				resolve(metadata);
+			});
 		});
 
 		dht.on('error', error => {
