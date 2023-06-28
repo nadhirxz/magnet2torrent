@@ -1,41 +1,56 @@
-const PeerDiscovery = require('torrent-discovery');
 const { randomBytes } = require('crypto');
 const { getMetadata } = require('./metadata');
+const DHT = require('bittorrent-dht');
 
-let connecting = true;
 let gotNoPeers = true;
 
-function torrentDiscovery(torrent, connectingSpinner, metadataSpinner) {
+function torrentDiscovery(torrent, connectingSpinner, metadataSpinner, timeout = 30000) {
 	const infoHash = torrent.infoHash;
-	const peerId = randomBytes(20);
 
 	return new Promise((resolve, reject) => {
-		const discovery = new PeerDiscovery({
-			peerId,
-			infoHash,
-			dht: true,
-			tracker: true,
-			port: 6881,
-			announce: torrent.announce || [],
+		const dht = new DHT();
+
+		dht.listen();
+
+		dht.on('ready', () => {
+			dht.announce(infoHash, 6881);
+			dht.lookup(infoHash);
 		});
 
-		discovery.on('peer', addr => {
-			connecting && connectingSpinner.succeed();
-			gotNoPeers && metadataSpinner.start();
+		dht.on('peer', (peer, infoHash, from) => {
+			const { host: address, port } = peer;
 
-			connecting = false;
-			gotNoPeers = false;
+			if (gotNoPeers) {
+				gotNoPeers = false;
+				connectingSpinner.succeed();
+				metadataSpinner.start();
+			}
 
-			const [address, port] = addr.split(':');
-			getMetadata(port, address, infoHash, peerId.toString('hex'), metadata => {
-				discovery.destroy();
-				resolve(metadata);
-			});
+			getMetadata(
+				port,
+				address,
+				torrent.infoHash,
+				randomBytes(20).toString('hex'),
+				metadata => {
+					dht.destroy();
+					resolve(metadata);
+				},
+				error => {
+					dht.destroy();
+					reject(error);
+				}
+			);
 		});
 
-		discovery.on('error', err => {
-			reject(err ?? 'could not connect to any peers');
+		dht.on('error', error => {
+			dht.destroy();
+			reject(error);
 		});
+
+		setTimeout(() => {
+			dht.destroy();
+			reject(`${gotNoPeers ? 'no peers found' : 'could not collect metadata'} (timeout exceeded)`);
+		}, timeout);
 	});
 }
 
