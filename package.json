@@ -1,7 +1,7 @@
 {
 	"name": "magnet2torrent",
 	"version": "1.0.0",
-	"description": "Convert magnet to torrent",
+	"description": "Convert magnet links to torrent files",
 	"main": "index.js",
 	"preferGlobal": true,
 	"bin": "./index.js",
