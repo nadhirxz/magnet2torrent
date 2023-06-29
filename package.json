@@ -1,5 +1,5 @@
 {
-	"name": "magnet2torrent",
+	"name": "m2t",
 	"version": "1.0.1",
 	"description": "Convert magnet links to torrent files",
 	"main": "index.js",
