@@ -3,22 +3,18 @@ const chalk = require('chalk');
 const ora = require('ora');
 const magnet2torrent = require('./magnet2torrent');
 
-const spinnerData = {
-	interval: 200,
-	frames: ['|', '/', '-', '|', '-', '\\'],
-};
-
-const connectingSpinner = ora({
-	text: 'connecting to peers',
-	spinner: spinnerData,
-	color: 'yellow',
+const spinner = (text) => ora({
+	text, spinner: {
+		spinner: {
+			interval: 200,
+		frames: ['|', '/', '-', '|', '-', '\\'],
+		},
+		color: 'yellow',
+	}, color: 'yellow'
 });
 
-const metadataSpinner = ora({
-	text: 'getting metadata',
-	spinner: spinnerData,
-	color: 'yellow',
-});
+const connectingSpinner = spinner('connecting to peers');
+const metadataSpinner = spinner('getting metadata');
 
 async function getTorrent(magnet, options) {
 	try {
