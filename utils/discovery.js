@@ -1,6 +1,7 @@
 const { randomBytes } = require('crypto');
 const { getMetadata } = require('./metadata');
 const DHT = require('bittorrent-dht');
+const config = require('../config');
 
 let gotNoPeers = true;
 
@@ -10,6 +11,7 @@ function torrentDiscovery(torrent, options) {
 		init = () => {}, 
 		onConnect = () => {},
 		onSuccess = () => {},
+		timeout = config.TIMEOUT,
 	} = options || {};
 
 	const infoHash = torrent.infoHash;
@@ -20,7 +22,7 @@ function torrentDiscovery(torrent, options) {
 		dht.listen();
 
 		dht.on('ready', () => {
-			dht.announce(infoHash, 6881);
+			dht.announce(infoHash, config.DHT_PORT);
 			dht.lookup(infoHash);
 			init();
 		});
@@ -48,7 +50,7 @@ function torrentDiscovery(torrent, options) {
 		setTimeout(() => {
 			dht.destroy();
 			reject(`${gotNoPeers ? 'no peers found' : 'could not collect metadata'} (timeout exceeded)`);
-		}, options.timeout);
+		}, timeout);
 	});
 }
 
