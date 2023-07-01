@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const { program } = require('commander');
-const { getTorrent } = require('./utils/torrent');
+const { getTorrent } = require('./utils/cli');
 require('pkginfo')(module);
 
 program
