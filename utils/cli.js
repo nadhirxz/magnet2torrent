@@ -29,16 +29,18 @@ async function getTorrent(magnet, options) {
 			...options,
 		};
 
-		const { file, metadata } = await magnet2torrent(magnet, opt);
+		const metadata = await magnet2torrent(magnet, opt);
 
 		const output = opt.output || metadata.name || metadata.infoHash.toUpperCase();
 		const filename = (/[.]/.exec(output) ? /[^.]+$/.exec(output)[0] : undefined) == 'torrent' ? output : output + '.torrent';
 
-		writeFileSync(filename, file);
+		writeFileSync(filename, metadata.toFile());
+
 		console.log(chalk.green(`torrent saved as ${chalk.bold(filename)}`));
 	} catch (error) {
 		connectingSpinner.isSpinning && !metadataSpinner.isSpinning && connectingSpinner.fail();
 		metadataSpinner.isSpinning && metadataSpinner.fail();
+		console.log(error);
 		console.log(chalk.red(`error: ${error?.message?.toLowerCase() ?? error}`));
 	} finally {
 		process.exit(0);
