@@ -3,13 +3,15 @@ const { getMetadata } = require('./metadata');
 const DHT = require('bittorrent-dht');
 const config = require('../config');
 
+let networkConnected = false;
 let gotNoPeers = true;
 
 function torrentDiscovery(torrent, options) {
 	// prettier-ignore
-	const { 
+	const {
 		init = () => {}, 
-		onConnect = () => {},
+		onNetworkConnect = () => {},
+		onPeerConnect = () => {},
 		onSuccess = () => {},
 		timeout = config.TIMEOUT,
 	} = options || {};
@@ -19,12 +21,15 @@ function torrentDiscovery(torrent, options) {
 	return new Promise((resolve, reject) => {
 		const dht = new DHT();
 
+		init();
+
 		dht.listen();
 
 		dht.on('ready', () => {
 			dht.announce(infoHash, config.DHT_PORT);
 			dht.lookup(infoHash);
-			init();
+			networkConnected = true;
+			onNetworkConnect();
 		});
 
 		dht.on('peer', (peer, infoHash, from) => {
@@ -32,7 +37,7 @@ function torrentDiscovery(torrent, options) {
 
 			if (gotNoPeers) {
 				gotNoPeers = false;
-				onConnect();
+				onPeerConnect();
 			}
 
 			getMetadata(port, address, torrent.infoHash, randomBytes(20).toString('hex'), metadata => {
@@ -47,9 +52,14 @@ function torrentDiscovery(torrent, options) {
 			reject(error);
 		});
 
+		// prettier-ignore
 		setTimeout(() => {
 			dht.destroy();
-			reject(`${gotNoPeers ? 'no peers found' : 'could not collect metadata'} (timeout exceeded)`);
+			reject(`${
+				networkConnected
+					? gotNoPeers ? 'no peers found' : 'could not collect metadata'
+					: 'could not connect to network'
+			} (timeout exceeded)`);
 		}, timeout);
 	});
 }

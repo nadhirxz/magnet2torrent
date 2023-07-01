@@ -3,24 +3,26 @@ const chalk = require('chalk');
 const ora = require('ora');
 const magnet2torrent = require('./magnet2torrent');
 
-const spinner = (text) => ora({
-	text, spinner: {
+const spinner = text =>
+	ora({
+		text,
 		spinner: {
 			interval: 200,
-		frames: ['|', '/', '-', '|', '-', '\\'],
+			frames: ['|', '/', '-', '|', '-', '\\'],
 		},
 		color: 'yellow',
-	}, color: 'yellow'
-});
+	});
 
-const connectingSpinner = spinner('connecting to peers');
+const connectingToNetworkSpinner = spinner('connecting to network');
+const connectingToPeersSpinner = spinner('connecting to peers');
 const metadataSpinner = spinner('getting metadata');
 
 async function getTorrent(magnet, options) {
 	try {
 		const opt = {
-			init: () => connectingSpinner.start(),
-			onConnect: () => connectingSpinner.succeed() && metadataSpinner.start(),
+			init: () => connectingToNetworkSpinner.start(),
+			onNetworkConnect: () => connectingToNetworkSpinner.succeed() && connectingToPeersSpinner.start(),
+			onPeerConnect: () => connectingToPeersSpinner.succeed() && metadataSpinner.start(),
 			onSuccess: () => metadataSpinner.succeed(),
 			...options,
 		};
@@ -34,7 +36,9 @@ async function getTorrent(magnet, options) {
 
 		console.log(chalk.green(`torrent saved as ${chalk.bold(filename)}`));
 	} catch (error) {
-		connectingSpinner.isSpinning && !metadataSpinner.isSpinning && connectingSpinner.fail();
+		// fail only the spinners that are spinning
+		connectingToNetworkSpinner.isSpinning && connectingToNetworkSpinner.fail();
+		connectingToPeersSpinner.isSpinning && connectingToPeersSpinner.fail();
 		metadataSpinner.isSpinning && metadataSpinner.fail();
 		console.log(error);
 		console.log(chalk.red(`error: ${error?.message?.toLowerCase() ?? error}`));
