@@ -40,7 +40,7 @@ async function getTorrent(magnet, options) {
 		connectingToNetworkSpinner.isSpinning && connectingToNetworkSpinner.fail();
 		connectingToPeersSpinner.isSpinning && connectingToPeersSpinner.fail();
 		metadataSpinner.isSpinning && metadataSpinner.fail();
-		console.log(error);
+
 		console.log(chalk.red(`error: ${error?.message?.toLowerCase() ?? error}`));
 	} finally {
 		process.exit(0);
