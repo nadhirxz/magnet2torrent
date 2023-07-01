@@ -11,7 +11,7 @@ function torrentDiscovery(torrent, options) {
 	const {
 		init = () => {}, 
 		onNetworkConnect = () => {},
-		onPeerConnect = () => {},
+		onPeerFound = () => {},
 		onSuccess = () => {},
 		timeout = config.TIMEOUT,
 	} = options || {};
@@ -37,7 +37,7 @@ function torrentDiscovery(torrent, options) {
 
 			if (gotNoPeers) {
 				gotNoPeers = false;
-				onPeerConnect();
+				onPeerFound();
 			}
 
 			getMetadata(port, address, torrent.infoHash, randomBytes(20).toString('hex'), metadata => {

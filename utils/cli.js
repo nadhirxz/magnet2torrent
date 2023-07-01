@@ -14,15 +14,15 @@ const spinner = text =>
 	});
 
 const connectingToNetworkSpinner = spinner('connecting to network');
-const connectingToPeersSpinner = spinner('connecting to peers');
+const peers = spinner('finding peers');
 const metadataSpinner = spinner('getting metadata');
 
 async function getTorrent(magnet, options) {
 	try {
 		const opt = {
 			init: () => connectingToNetworkSpinner.start(),
-			onNetworkConnect: () => connectingToNetworkSpinner.succeed() && connectingToPeersSpinner.start(),
-			onPeerConnect: () => connectingToPeersSpinner.succeed() && metadataSpinner.start(),
+			onNetworkConnect: () => connectingToNetworkSpinner.succeed() && peers.start(),
+			onPeerFound: () => peers.succeed() && metadataSpinner.start(),
 			onSuccess: () => metadataSpinner.succeed(),
 			...options,
 		};
@@ -38,7 +38,7 @@ async function getTorrent(magnet, options) {
 	} catch (error) {
 		// fail only the spinners that are spinning
 		connectingToNetworkSpinner.isSpinning && connectingToNetworkSpinner.fail();
-		connectingToPeersSpinner.isSpinning && connectingToPeersSpinner.fail();
+		peers.isSpinning && peers.fail();
 		metadataSpinner.isSpinning && metadataSpinner.fail();
 
 		console.log(chalk.red(`error: ${error?.message?.toLowerCase() ?? error}`));
