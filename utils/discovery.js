@@ -4,7 +4,14 @@ const DHT = require('bittorrent-dht');
 
 let gotNoPeers = true;
 
-function torrentDiscovery(torrent, connectingSpinner, metadataSpinner, timeout = 30000) {
+function torrentDiscovery(torrent, options) {
+	// prettier-ignore
+	const { 
+		init = () => {}, 
+		onConnect = () => {},
+		onSuccess = () => {},
+	} = options || {};
+
 	const infoHash = torrent.infoHash;
 
 	return new Promise((resolve, reject) => {
@@ -15,6 +22,7 @@ function torrentDiscovery(torrent, connectingSpinner, metadataSpinner, timeout =
 		dht.on('ready', () => {
 			dht.announce(infoHash, 6881);
 			dht.lookup(infoHash);
+			init();
 		});
 
 		dht.on('peer', (peer, infoHash, from) => {
@@ -22,12 +30,12 @@ function torrentDiscovery(torrent, connectingSpinner, metadataSpinner, timeout =
 
 			if (gotNoPeers) {
 				gotNoPeers = false;
-				connectingSpinner.succeed();
-				metadataSpinner.start();
+				onConnect();
 			}
 
 			getMetadata(port, address, torrent.infoHash, randomBytes(20).toString('hex'), metadata => {
 				dht.destroy();
+				onSuccess();
 				resolve(metadata);
 			});
 		});
@@ -40,7 +48,7 @@ function torrentDiscovery(torrent, connectingSpinner, metadataSpinner, timeout =
 		setTimeout(() => {
 			dht.destroy();
 			reject(`${gotNoPeers ? 'no peers found' : 'could not collect metadata'} (timeout exceeded)`);
-		}, timeout);
+		}, options.timeout);
 	});
 }
 

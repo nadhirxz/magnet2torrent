@@ -1,8 +1,7 @@
-const parseTorrent = require('parse-torrent');
 const { writeFileSync } = require('fs');
-const { torrentDiscovery } = require('./discovery');
 const chalk = require('chalk');
 const ora = require('ora');
+const magnet2torrent = require('./magnet2torrent');
 
 const spinnerData = {
 	interval: 200,
@@ -21,20 +20,21 @@ const metadataSpinner = ora({
 	color: 'yellow',
 });
 
-async function getTorrent(magnet, output) {
+async function getTorrent(magnet, options) {
 	try {
-		magnet = parseTorrent(magnet);
-		connectingSpinner.start();
+		const opt = {
+			init: () => connectingSpinner.start(),
+			onConnect: () => connectingSpinner.succeed() && metadataSpinner.start(),
+			onSuccess: () => metadataSpinner.succeed(),
+			...options,
+		};
 
-		const torrent = await torrentDiscovery(magnet, connectingSpinner, metadataSpinner);
+		const { file, metadata } = await magnet2torrent(magnet, opt);
 
-		metadata = parseTorrent(torrent);
-		output = output || metadata.name || magnet.infoHash.toUpperCase();
-		const file = parseTorrent.toTorrentFile({ ...parseTorrent(metadata), announce: magnet.announce || [] });
+		const output = opt.output || metadata.name || metadata.infoHash.toUpperCase();
 		const filename = (/[.]/.exec(output) ? /[^.]+$/.exec(output)[0] : undefined) == 'torrent' ? output : output + '.torrent';
-		writeFileSync(filename, file);
 
-		metadataSpinner.succeed();
+		writeFileSync(filename, file);
 		console.log(chalk.green(`torrent saved as ${chalk.bold(filename)}`));
 	} catch (error) {
 		connectingSpinner.isSpinning && !metadataSpinner.isSpinning && connectingSpinner.fail();
